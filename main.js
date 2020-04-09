@@ -1,6 +1,4 @@
-const baseURL = "https://ci-swapi.herokuapp.com/api/";
-
-function getData(type, cb) {
+function getData(url, cb) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -9,7 +7,7 @@ function getData(type, cb) {
     };
 
 
-    xhr.open("GET", baseURL + type + "/");
+    xhr.open("GET", url);
 
     xhr.send();
 }
@@ -24,11 +22,28 @@ function getTableHeaders(obj){ //for any appropriate obj
     return `<tr>${tableHeaders}</tr>`; //and then return all the <td> items as a <tr> (a table row)
 }
 
-function writeToDocument(type){ //for a specific type of API data
+function generatePaginationButtons(next, prev){
+    if(next && prev){
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>
+               <button onclick="writeToDocument('${next}')">Next</button>`;
+    } else if (next && !prev){
+        return `<button onclick="writeToDocument('${next}')">Next</button>`;
+    } else if(!next && prev){
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>`;
+    }
+}
+
+function writeToDocument(url){ //for a specific type of API data
     var tableRows = [];
     var el = document.getElementById("data"); //target the HTML element with id "data"
     el.innerHTML = " "; //set it to empty
-    getData(type, function(data){ //get the data for the API type (see the function getData)
+
+    getData(url, function(data){ //get the data for the API type (see the function getData)
+        var pagination;
+        if(data.next || data.previous){
+            pagination = generatePaginationButtons(data.next, data.previous)
+        }
+
         data = data.results;
         var tableHeaders = getTableHeaders(data[0]); // populate the above-created table headers with the data obtained from getData
 
@@ -42,7 +57,7 @@ function writeToDocument(type){ //for a specific type of API data
             });
             tableRows.push(`<tr>${dataRow}</tr>`);
         });
-        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>`; //insert the table headers - populated with data from getData - into the "data" DOM element as <table>
+        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}`; //insert the table headers - populated with data from getData - into the "data" DOM element as <table>
     });
 }
 

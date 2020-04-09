@@ -36,10 +36,10 @@ function generatePaginationButtons(next, prev){
 function writeToDocument(url){ //for a specific type of API data
     var tableRows = [];
     var el = document.getElementById("data"); //target the HTML element with id "data"
-    el.innerHTML = " "; //set it to empty
+    //el.innerHTML = " "; //set it to empty
 
     getData(url, function(data){ //get the data for the API type (see the function getData)
-        var pagination;
+        var pagination = "";
         if(data.next || data.previous){
             pagination = generatePaginationButtons(data.next, data.previous)
         }
@@ -57,7 +57,7 @@ function writeToDocument(url){ //for a specific type of API data
             });
             tableRows.push(`<tr>${dataRow}</tr>`);
         });
-        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}`; //insert the table headers - populated with data from getData - into the "data" DOM element as <table>
+        el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}`.replace(/,/g, ""); //insert the table headers - populated with data from getData - into the "data" DOM element as <table>
     });
 }
 
